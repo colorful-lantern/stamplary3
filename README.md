@@ -1,0 +1,1 @@
+# stamplary3
