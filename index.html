@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            /* 画面全体に背景を適用 */
+            background-color: #c2e2ed;
+            font-size: 16px; /* 基本フォントサイズ */
+        }
+
+        #generalstatus {
+            /* 背景指定を削除 */
+            border-radius: 16px;
+            padding-bottom: 0;
+            position: relative;
+            overflow: hidden;
+            min-height: 350px; /* 紙吹雪が見やすいように高さを確保 */
+            background: none !important;
+        }
+
+        /* 紙吹雪アニメーション用 */
+        .confetti-animation-area {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            background: transparent;
+            display: none; /* デフォルト非表示、JSで切り替え */
+        }
+        .confetti {
+            position: absolute;
+            width: 0.7rem; /* 10px → 0.625rem */
+            height: 0.7rem; /* 10px → 0.625rem */
+            border-radius: 0.125rem; /* 2px → 0.125rem */
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #dividestatus,
+        #iconlegendstatus {
+            background: rgba(255, 255, 255, 1);
+            border-radius: 16px 16px 16px 16px;
+            padding-bottom: 0.75rem; /* 12px → 0.75rem */
+        }
+
+        #container {
+            background: #fff;
+            border-radius: 50%;
+            display: inline-block;
+            padding: 1rem; /* 16px → 1rem */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            width: 70vw;
+            height: 70vw;
+            max-width: 18.75rem; /* 300px → 18.75rem */
+            max-height: 18.75rem; /* 300px → 18.75rem */
+        }
+
+        .eachcontainer {
+            background: #fff;
+            border-radius: 0.75rem; /* 12px → 0.75rem */
+            margin: 0.25rem 0; /* 4px → 0.25rem */
+            min-height: 3rem; /* 48px → 3rem */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* navbar・footer以外のテキストサイズを相対指定に */
+        #generalstatus,
+        #generalstatus *:not(i):not(.bi):not(.navbar):not(.navbar-brand):not(nav):not(#footer):not(.fixed-bottom):not(.btn) {
+            font-size: 1.3rem;
+        }
+        #generalstatus .fw-bold,
+        #generalstatus .m-auto.fw-bold.mb-2 {
+            font-size: 1.1rem;
+        }
+        #generalstatus .eachcontainer {
+            font-size: 1.05rem;
+        }
+        #dividestatus span {
+            font-size: 0.92em !important;
+        }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg" style="background-color: #c2e2ed;">
+      <div class="container-fluid d-flex m-auto">
+        <p class="navbar-brandfw-bold fw-bold fs-3 text-black ms-1 my-1 me-0" id="title">マイリハビリ</p>
+      </div>
+    </nav>
+
+    <div id="generalstatus" class="m-2 text-center">
+      <!-- 紙吹雪アニメーション表示エリア -->
+      <div id="cracker-animation-area-card" class="confetti-animation-area"></div>
+      <div id="container" class="my-4 mx-auto"></div>
+      <div id="dividestatus" class="p-2 my-2 text-center" style="max-width: 90%; margin: 0 auto; min-width: 16.25rem;">
+        <div class="container-fluid">
+          <div class="m-auto fw-bold mb-2">今日のリハビリ</div>
+            <div class="row mb-1 justify-content-center text-center" id="rehab-row">
+            <div class="col-6 px-1 rehab-block" data-rehab="rehabilitation1">
+              <span style="font-size: 0.92em; white-space: nowrap;">理学療法</span>
+              <div id="each0" class="eachcontainer"></div>
+            </div>
+            <div class="col-6 px-1 rehab-block" data-rehab="rehabilitation2">
+              <span style="font-size: 0.92em; white-space: nowrap;">言語療法</span>
+              <div id="each1" class="eachcontainer"></div>
+            </div>
+            <div class="col-6 px-1 rehab-block" data-rehab="rehabilitation3">
+              <span style="font-size: 0.92em; white-space: nowrap;">作業療法</span>
+              <div id="each2" class="eachcontainer"></div>
+            </div>
+            <div class="col-6 px-1 rehab-block" data-rehab="rehabilitation4">
+              <span style="font-size: 0.92em; white-space: nowrap;">心理療法</span>
+              <div id="each3" class="eachcontainer"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="iconlegendstatus" class="p-2 mt-2 text-center" style="max-width: 90%; margin: 0 auto; min-width: 16.25rem;">
+          <div class="container-fluid m-0 p-0">
+            <button class="btn btn-link text-secondary fw-bold ms-1" type="button"
+              data-bs-toggle="collapse" data-bs-target="#icon-legend"
+              aria-expanded="false" aria-controls="icon-legend"
+              style="text-decoration:none; font-size:1.1rem;">
+              アイコンの意味 <span id="icon-legend-arrow">▼</span>
+            </button>
+            <div class="collapse" id="icon-legend">
+              <table class="table table-borderless m-auto align-middle" style="max-width: 400px;">
+                <tbody>
+                  <tr>
+                    <td class="text-center align-middle" style="width: 48px; vertical-align: middle;">
+                      <i class="bi bi-x-circle fs-4 text-secondary"></i>
+                    </td>
+                    <td class="text-start align-middle fs-6" style="vertical-align: middle;">
+                      まだリハビリに取り組んでいません。
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="text-center align-middle" style="width: 48px; vertical-align: middle;">
+                      <i class="bi bi-check-circle-fill fs-4 text-success"></i>
+                    </td>
+                    <td class="text-start align-middle fs-6" style="vertical-align: middle;">
+                      リハビリに取り組みました。
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+    <div id="footer" class="container-fluid">
+      <div class="fixed-bottom bg-white m-auto"
+           style="border-radius: 26px; left: 0; right: 0; width: 95%; max-width: 600px; bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.18);">
+        <div class="row m-auto p-0" style="border-radius: 16px;">
+          <div class="col-3">
+            <div id="homebtn" class="text-center m-auto">
+              <a href="index.html" class="btn btn-link text-primary text-decoration-none text-nowrap" style="font-size: 1.2rem;">
+                <i class="bi bi-house-fill fw-bold" style="font-size: 2rem;"></i><br>
+              きょう</a>
+            </div>
+          </div>
+          <div class="col-3">
+            <div id="calbtn" class="text-center m-auto">
+              <a href="calender.html" class="btn btn-link text-black text-decoration-none text-nowrap" style="font-size: 1.2rem;">
+                <i class="bi bi-calendar2-week fw-bold" style="font-size: 2rem;"></i><br>
+              きろく</a>
+            </div>
+          </div>
+          <div class="col-3">
+            <div id="explainbtn" class="text-center m-auto">
+              <a href="explain.html" class="btn btn-link text-black text-decoration-none text-nowrap" style="font-size: 1.2rem;">
+                <i class="bi bi-question-circle fw-bold" style="font-size: 2rem;"></i><br>
+              使い方</a>
+            </div>
+          </div>
+          <div class="col-3">
+            <div id="settingbtn" class="text-center m-auto">
+              <a href="setting.html" class="btn btn-link text-black text-decoration-none text-nowrap" style="font-size: 1.2rem;">
+              <i class="bi bi-gear-fill fw-bold" style="font-size: 2rem;"></i><br>
+              設定</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="height: 200px;"></div>
+
+
+    <script src="js/progressbar.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const confettiContainer = document.getElementById('cracker-animation-area-card');
+            const generalStatus = document.getElementById('generalstatus');
+            let confettiIntervalId = null;
+
+            const confettiColors = [
+                '#FFD700', // ゴールド
+                '#FF69B4', // ホットピンク
+                '#00CED1', // ダークターコイズ
+                '#7FFF00', // チャールーズグリーン
+                '#FF8C00', // ダークオレンジ
+                '#9370DB', // ミディアムパープル
+                '#FFFF00', // イエロー
+                '#ADFF2F', // グリーンイエロー
+                '#1E90FF', // ドジャーブルー
+                '#FA8072', // サーモン
+                '#BA55D3', // ミディアムオーキッド
+                '#00FA9A', // ミディアムスプリンググリーン
+                '#FFDAB9', // ピーチパフ
+                '#6495ED', // コーラル
+                '#FFDEAD'  // ナバホホワイト
+            ];
+
+            function createConfetti() {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.backgroundColor = confettiColors[anime.random(0, confettiColors.length - 1)];
+                confetti.style.left = `${anime.random(0, confettiContainer.offsetWidth - 8)}px`;
+                confetti.style.top = `-10px`;
+                confettiContainer.appendChild(confetti);
+
+                anime({
+                    targets: confetti,
+                    translateY: confettiContainer.offsetHeight + 10,
+                    translateX: anime.random(-20, 20),
+                    rotate: anime.random(0, 720),
+                    opacity: [1, 0.5, 0],
+                    duration: anime.random(1500, 3000),
+                    easing: 'linear',
+                    complete: function(anim) {
+                        anim.animatables[0].target.remove();
+                    }
+                });
+            }
+
+            // 紙吹雪表示条件判定
+            const checkAndTriggerConfetti = () => {
+                const nmboftrue = parseInt(localStorage.getItem('nmboftrue'), 10);
+                const numberofClass = parseInt(localStorage.getItem('numberofClass'), 10);
+                const conditionMet = !isNaN(nmboftrue) && !isNaN(numberofClass) && nmboftrue === numberofClass;
+
+                if (conditionMet) {
+                    // 紙吹雪アニメーション表示
+                    confettiContainer.style.display = 'block';
+                    // 画面全体の背景を消す
+                    document.body.style.backgroundImage = 'none';
+                    document.body.style.backgroundColor = '#c2e2ed';
+
+                    if (confettiIntervalId === null) {
+                        confettiIntervalId = setInterval(createConfetti, 70);
+                    }
+                } else {
+                    // 紙吹雪非表示
+                    confettiContainer.style.display = 'none';
+                    // 画面全体の背景を復活
+                    document.body.style.backgroundColor = '#c2e2ed';
+                    document.body.style.backgroundImage =
+                      'radial-gradient(circle, #ffffff 12px, transparent 5px),';
+                    document.body.style.backgroundSize = '40px 40px, 60px 60px, 90px 90px';
+                    document.body.style.backgroundPosition = '0 0, 20px 20px, 45px 45px';
+
+                    if (confettiIntervalId !== null) {
+                        clearInterval(confettiIntervalId);
+                        confettiIntervalId = null;
+                        // 既存の紙吹雪の粒子をすべて削除
+                        const existingConfetti = confettiContainer.querySelectorAll('.confetti');
+                        existingConfetti.forEach(c => c.remove());
+                    }
+                }
+            };
+
+            checkAndTriggerConfetti();
+            setInterval(checkAndTriggerConfetti, 5000);
+        });
+    </script>
+    <script>
+      // ▼▲の切り替え
+      document.addEventListener('DOMContentLoaded', function() {
+        var collapseEl = document.getElementById('icon-legend');
+        var arrow = document.getElementById('icon-legend-arrow');
+        collapseEl.addEventListener('show.bs.collapse', function () {
+          arrow.textContent = '▲';
+        });
+        collapseEl.addEventListener('hide.bs.collapse', function () {
+          arrow.textContent = '▼';
+        });
+      });
+    </script>
+  </body>
+</html>
