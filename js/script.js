@@ -2,6 +2,7 @@
 // Docs: http://progressbarjs.readthedocs.org/en/1.0.0/
 
 // comments
+// 2025/06/25 update -- you can delete the rehabilitation record by URL parameter each0~3=false
 
 // grobal variables
 var numberOfClass = 0;
@@ -14,15 +15,90 @@ function saveQueryParamsToLocalStorage() {
 }
 saveQueryParamsToLocalStorage();
 
+// URLパラメータの中の処理
+(function handleEachParamsFromUrl() {
+    const params = new URLSearchParams(location.search);
+    
+    // 従来のeach0-3パラメータの処理（下位互換性のため）
+    for (let i = 0; i <= 3; i++) {
+        const eachKey = `each${i}`;
+        const rehabKey = `rehabilitation${i + 1}`;
+        const paramValue = params.get(eachKey);
+        const localValue = localStorage.getItem(rehabKey);
+        
+        if (localValue === 'true' && paramValue === 'false') {
+            var rehabName = '';
+            switch (i) {
+                case 0:
+                    rehabName = '理学療法';
+                    break;
+                case 1:
+                    rehabName = '言語療法';
+                    break;
+                case 2:
+                    rehabName = '作業療法';
+                    break;
+                case 3:
+                    rehabName = '心理療法';
+                    break;
+                default:
+                    rehabName = `未定義`;
+            }
+            alert(`${rehabName}の記録を削除します。`);
+            localStorage.setItem(rehabKey, 'false');
+        } else if(paramValue === 'false'){
+            alert('このリハビリの記録はありません。');
+        }
+    }
+    
+    // 新しいランダムIDパラメータの処理
+    if (typeof REHAB_IDS !== 'undefined') {
+        Object.keys(REHAB_IDS).forEach(index => {
+            const randomId = REHAB_IDS[index];
+            const rehabKey = `rehabilitation${parseInt(index) + 1}`;
+            const paramValue = params.get(randomId);
+            const localValue = localStorage.getItem(rehabKey);
+            
+            if (localValue === 'true' && paramValue === 'false') {
+                var rehabName = '';
+                switch (parseInt(index)) {
+                    case 0:
+                        rehabName = '理学療法';
+                        break;
+                    case 1:
+                        rehabName = '言語療法';
+                        break;
+                    case 2:
+                        rehabName = '作業療法';
+                        break;
+                    case 3:
+                        rehabName = '心理療法';
+                        break;
+                    default:
+                        rehabName = `未定義`;
+                }
+                alert(`${rehabName}の記録を削除します。`);
+                localStorage.setItem(rehabKey, 'false');
+            } else if(paramValue === 'false'){
+                alert('このリハビリの記録はありません。');
+            }
+        });
+    }
+})();
+
 // 日付が変わった場合にlocalStorageの古いデータを削除する
 (function clearOldDataOnNewDay() {
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD形式
     const lastAccessDate = localStorage.getItem('lastAccessDate');
 
     if (lastAccessDate !== today) {
-        // 日付が変わった場合、each0~3を削除
+        // 日付が変わった場合、従来のeach0~3と新しいランダムIDを削除
         for (let i = 0; i <= 3; i++) {
             localStorage.removeItem(`each${i}`);
+            // 新しいランダムIDも削除
+            if (typeof REHAB_IDS !== 'undefined' && REHAB_IDS[i]) {
+                localStorage.removeItem(REHAB_IDS[i]);
+            }
         }
 
         // 1年以上前のデータを削除
@@ -58,12 +134,17 @@ saveQueryParamsToLocalStorage();
     }
 })();
 
-// localstrageのkey(each0~3)のvalueがtrueである場合、cntを足して、その数を、localstrageのkey=nmboftrueに保存する
+// localstrageのkey(従来のeach0~3または新しいランダムID)のvalueがtrueである場合、cntを足して、その数を、localstrageのkey=nmboftrueに保存する
 function saveTrueCountToLocalStorage() {
     let cnt = 0;
     let achievedStatus = [];
     for (let i = 0; i <= 3; i++) {
-        const key = `each${i}`;
+        // 新しいランダムIDを優先的に使用
+        let key = `each${i}`;
+        if (typeof REHAB_IDS !== 'undefined' && REHAB_IDS[i]) {
+            key = REHAB_IDS[i];
+        }
+        
         const value = localStorage.getItem(key);
         const key2 = `rehabilitation${i + 1}`;
         const value2 = localStorage.getItem(key2);
@@ -112,8 +193,11 @@ function loadCheckboxStates() {
     if(cnt>0){
         numberOfClass = cnt;
     }else{
-        // ポップアップで「リハビリテーションを選択してください」と表示する
-        alert('初期設定を行います。次の画面で自分のリハビリテーションを種類を選択してください');
+        // キャンセルを押した場合は何もしない
+        if (!confirm('OKを押して、次の画面で設定を行います。\nはじめてではない方は、キャンセルを押してください。')) {
+            // rehabilitation.htmlにリダイレクトする
+            alert('いつもと違うブラウザーでアクセスしている可能性があります。いつもと同じブラウザーでアクセスしてください。');
+        }
         // rehabilitation.htmlにリダイレクトする
         location.href = 'setting.html';
         return;
@@ -138,12 +222,17 @@ if (location.search.includes('clear=true')) {
     location.reload();  
 };
 
-// Display icons based on local storage values for each0 to each3
+// Display icons based on local storage values for each0 to each3 (または新しいランダムID)
 function displayIconsBasedOnLocalStorage() {
     for (let i = 0; i <= 3; i++) {
-        const key = `each${i}`;
+        // 新しいランダムIDを優先的に使用
+        let key = `each${i}`;
+        if (typeof REHAB_IDS !== 'undefined' && REHAB_IDS[i]) {
+            key = REHAB_IDS[i];
+        }
+        
         const value = localStorage.getItem(key);
-        const element = document.getElementById(key);
+        const element = document.getElementById(`each${i}`); // HTMLのIDは変更しない
 
         const key2 = `rehabilitation${i+1}`;
         const value2 = localStorage.getItem(key2);
@@ -341,142 +430,70 @@ function hideUnusedRehabilitation() {
 }
 hideUnusedRehabilitation();
 
-// // 新しい指標を計算する関数群
+// ランダムIDを使用してリハビリの記録を設定する関数
+function setRehabRecord(rehabIndex, value) {
+    let key = `each${rehabIndex}`;
+    if (typeof REHAB_IDS !== 'undefined' && REHAB_IDS[rehabIndex]) {
+        key = REHAB_IDS[rehabIndex];
+    }
+    localStorage.setItem(key, value);
+    // 従来のeach0~3も同時に設定（下位互換性のため）
+    localStorage.setItem(`each${rehabIndex}`, value);
+}
 
-// // 今月の「clear」達成日数とリハビリに取り組んだ総日数を計算する関数
-// function getMonthlyRehabStats() {
-//     let clearDaysThisMonth = 0;
-//     let daysWithRehabThisMonth = 0;
-//     const today = new Date();
-//     const currentMonth = today.getMonth(); // 0-11
-//     const currentYear = today.getFullYear();
+// ランダムIDからリハビリの記録を取得する関数
+function getRehabRecord(rehabIndex) {
+    let key = `each${rehabIndex}`;
+    if (typeof REHAB_IDS !== 'undefined' && REHAB_IDS[rehabIndex]) {
+        key = REHAB_IDS[rehabIndex];
+    }
+    return localStorage.getItem(key);
+}
 
-//     // 今月の1日から今日までの日付をループ
-//     for (let d = 1; d <= today.getDate(); d++) {
-//         const date = new Date(currentYear, currentMonth, d);
-//         const dateStr = date.toISOString().split('T')[0];
-//         const status = localStorage.getItem(`status_${dateStr}`);
+// QRコード用のURLを生成する関数（新しいランダムIDを使用）
+function generateQRCodeURL(rehabIndex, baseURL = window.location.origin + window.location.pathname) {
+    let paramKey = `each${rehabIndex}`;
+    if (typeof REHAB_IDS !== 'undefined' && REHAB_IDS[rehabIndex]) {
+        paramKey = REHAB_IDS[rehabIndex];
+    }
+    return `${baseURL}?${paramKey}=true`;
+}
 
-//         if (status) { // statusが存在する（何かしらリハビリに取り組んだ）
-//             daysWithRehabThisMonth++;
-//             if (status.startsWith('clear')) {
-//                 clearDaysThisMonth++;
-//             }
-//         }
-//     }
-//     return { clearDaysThisMonth, daysWithRehabThisMonth };
-// }
+// 削除用URLを生成する関数（新しいランダムIDを使用）
+function generateDeleteURL(rehabIndex, baseURL = window.location.origin + window.location.pathname) {
+    let paramKey = `each${rehabIndex}`;
+    if (typeof REHAB_IDS !== 'undefined' && REHAB_IDS[rehabIndex]) {
+        paramKey = REHAB_IDS[rehabIndex];
+    }
+    return `${baseURL}?${paramKey}=false`;
+}
 
-// // 過去7日間の達成状況を計算する関数
-// function getLast7DaysStatus() {
-//     let clearCount = 0;
-//     let partialCount = 0; // 一部達成
-//     let noRehabCount = 0; // リハビリ未実施
+// ランダムIDのURLパラメータでリハビリを実行する処理
+(function handleRandomIdParams() {
+    if (typeof REHAB_IDS === 'undefined') return;
+    
+    const params = new URLSearchParams(location.search);
+    
+    Object.keys(REHAB_IDS).forEach(index => {
+        const randomId = REHAB_IDS[index];
+        const paramValue = params.get(randomId);
+        
+        if (paramValue === 'true') {
+            // ランダムIDでアクセスされた場合、そのリハビリを実行済みにする
+            localStorage.setItem(randomId, 'true');
+            localStorage.setItem(`each${index}`, 'true'); // 下位互換性のため
+        }
+    });
+})();
 
-//     for (let i = 0; i < 7; i++) {
-//         const date = new Date();
-//         date.setDate(date.getDate() - i);
-//         const dateStr = date.toISOString().split('T')[0];
-//         const status = localStorage.getItem(`status_${dateStr}`);
-
-//         if (status && status.startsWith('clear')) {
-//             clearCount++;
-//         } else if (status && !isNaN(parseInt(status.split(',')[0]))) { // 数値（一部達成）の場合
-//             partialCount++;
-//         } else { // statusがない、またはclearでも数値でもない場合
-//             noRehabCount++;
-//         }
-//     }
-//     return { clearCount, partialCount, noRehabCount };
-// }
-
-// // メッセージを自動生成して表示する関数（修正版）
-// function displayAutomaticMessage() {
-//     const today = new Date().toISOString().split('T')[0]; //
-//     const status = localStorage.getItem(`status_${today}`); //
-//     const messageContainer = document.querySelector('#dividestatus.bg-info'); //
-
-//     let message = '';
-//     let bestMessagePriority = -1; // メッセージの優先度を管理（高いほど優先）
-
-//     const nmboftrue = parseInt(localStorage.getItem('nmboftrue') || '0', 10); //
-//     const numberofClass = parseInt(localStorage.getItem('numberofClass') || '0', 10); //
-//     const consecutiveDays = getConsecutiveClearDays(); // 連続達成日数
-//     const monthlyStats = getMonthlyRehabStats();
-//     const last7DaysStats = getLast7DaysStatus();
-
-//     // 1. リハビリが設定されていない場合の最優先メッセージ
-//     if (numberofClass === 0) { //
-//         message = `「設定」タブから今日行うリハビリを選択してください。`;
-//         if (messageContainer) {
-//             messageContainer.textContent = message;
-//         }
-//         return; // これが最優先なので、他のチェックはしない
-//     }
-
-//     // 2. 今日の達成状況に基づいたメッセージ
-//     if (status && status.startsWith('clear')) { //
-//         // 今日クリアの場合
-//         if (consecutiveDays >= 3 && consecutiveDays < 7) { //
-//             message = `🎉 おめでとうございます！${consecutiveDays}日連続達成中です！素晴らしい！`;
-//             bestMessagePriority = 5;
-//         } else if (consecutiveDays >= 7) { //
-//             message = `🏆 連続達成記録更新中！${consecutiveDays}日連続達成、この調子です！`;
-//             bestMessagePriority = 6;
-//         } else {
-//             message = '🙌 全てのリハビリを達成しました！よく頑張りました！';
-//             bestMessagePriority = 4;
-//         }
-//     } else if (nmboftrue > 0 && nmboftrue < numberofClass) { //
-//         // 一部達成の場合
-//         const remaining = numberofClass - nmboftrue; //
-//         message = `あと${remaining}個のリハビリで今日の目標達成です！頑張りましょう！`;
-//         bestMessagePriority = 3;
-//     } else if (nmboftrue === 0 && numberofClass > 0) { //
-//         // 未達成の場合（リハビリが設定されているが一つも達成していない）
-//         message = `今日はまだリハビリが始まっていません。一つずつ取り組んでいきましょう！`;
-//         bestMessagePriority = 2;
-//     } else {
-//         // その他の場合や、初回アクセスなどでstatusがnullの場合
-//         message = '今日のリハビリに取り組みましょう！';
-//         bestMessagePriority = 1;
-//     }
-
-//     // 3. 他の指標に基づいたメッセージ（優先度を考慮して上書き）
-//     // 月間達成率が高い場合
-//     if (monthlyStats.daysWithRehabThisMonth > 0) {
-//         const monthlyAchieveRate = (monthlyStats.clearDaysThisMonth / monthlyStats.daysWithRehabThisMonth) * 100;
-//         if (monthlyAchieveRate >= 80 && bestMessagePriority < 4) { // 今日の達成メッセージより優先度が低い場合のみ
-//             message = `✨ 今月の達成率は${Math.round(monthlyAchieveRate)}%！素晴らしいペースです！`;
-//             bestMessagePriority = 4; // 連続達成よりは低いが、今日未達成なら優先
-//         }
-//     }
-
-//     // 今月のクリア日数が特定の数を超えた場合
-//     if (monthlyStats.clearDaysThisMonth >= 5 && bestMessagePriority < 4) { // 例: 5日以上クリア
-//         message = `💪 今月はすでに${monthlyStats.clearDaysThisMonth}日達成しています！この調子で頑張りましょう！`;
-//         bestMessagePriority = 4;
-//     }
-
-//     // 過去7日間で全てクリアの日があった場合（今日クリアでないが、過去は頑張っていた場合など）
-//     if (last7DaysStats.clearCount >= 5 && status && !status.startsWith('clear') && bestMessagePriority < 4) {
-//         message = `📈 過去7日間で${last7DaysStats.clearCount}日も達成していますね！素晴らしい努力です！`;
-//         bestMessagePriority = 4;
-//     }
-
-
-//     if (messageContainer) {
-//         messageContainer.textContent = message;
-//     }
-// }
-
-// // ページロード時と、リハビリ状況が更新される可能性のあるタイミングでメッセージ表示関数を呼び出す
-// document.addEventListener('DOMContentLoaded', displayAutomaticMessage); //
-
-// // 既存の saveTrueCountToLocalStorage() の後に呼び出す
-// // 現状のscript.jsではsaveTrueCountToLocalStorage()が複数回呼ばれるので、
-// // 最後のdisplayAutomaticMessage()呼び出しで最新の状態が反映されます
-// // 最後の呼び出し部分を以下のように修正:
-// saveTrueCountToLocalStorage(); //
-// // displayWeeklyStatus(); // コメントアウトされているため、必要であれば有効にしてください
-// displayAutomaticMessage(); // ここに呼び出しを追加
+// ページを強制的にリロードする関数
+function forceReload() {
+    // URLパラメータをクリアしてリロード
+    const url = new URL(window.location.href);
+    url.search = ''; // パラメータをクリア
+    window.location.href = url.toString();
+}
+// ページをリロードするボタンのイベントリスナー
+if (window.location.search) {
+    forceReload();
+}
