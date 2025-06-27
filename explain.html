@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <title>Document</title>
+    <title>マイリハビリ-使い方</title>
     <style>
         body {
             background-color: #c2e2ed; /* 全体の背景色をindex.htmlに合わせる */
@@ -140,20 +140,21 @@
           </button>
           <div id="collapseCard2" class="collapse">
             <p class="card-text">リハビリが終わったら、<br>QRコードを読み取ってください。</p>
-            <div class="card"> <!-- ネストされたカード -->
-              <div class="card-body m-0 p-1">
-                <p class="card-text"><b>はじめて</b><br>このシステムを使用するときは、<br>設定画面からリハビリの種類を<br>選択します。<br>選択したら「保存する」を<br>押してください。</p>
-                <div class="alert alert-warning d-flex align-content-center m-1 p-1" role="alert">
-                  <div class="row-cols-1 align-content-center m-1 text-center">
-                    <i class="bi bi-lightbulb fs-3"></i>
-                  </div>
-                  <div class="row-cols-11 d-flex align-items-center m-1">
-                    何回でも<br>取り組むリハビリの種類を<br>変更することができます。
-                  </div>
-                </div>
-                <div class="d-flex justify-content-center mt-2">
-                  <a href="setting.html" class="btn btn-outline-primary w-75 my-2">設定画面へ</a>
-                </div>
+            <div class="alert alert-danger d-flex align-content-center m-1 p-1" role="alert">
+              <div class="row-cols-2 align-content-center m-1 text-center">
+                <i class="bi bi-exclamation-triangle-fill fs-3"></i>
+              </div>
+              <div class="row-cols-10 d-flex align-items-center m-auto text-center pe-2">
+                QRコードを読み取ったら、<br>毎回同じブラウザで開いてください。
+              </div>
+            </div>
+            <div class="alert alert-warning d-flex align-content-center m-1 p-1" role="alert">
+              <div class="row-cols-2 align-content-center m-1 text-center">
+                <i class="bi bi-lightbulb fs-3"></i>
+              </div>
+              <div class="row-cols-10 d-flex align-items-center m-auto text-center pe-2">
+                間違えてスタンプを獲得したときは、スタッフにお知らせください。<br>
+                きょうの記録についてはスタンプを取り消すことができます。
               </div>
             </div>
           </div>
@@ -228,6 +229,22 @@
           </button>
           <div id="collapseAppFeature4" class="collapse">
             <p class="card-text">あなたが取り組むリハビリを<br>選ぶことができます。</p>
+            <div class="alert alert-warning d-flex align-content-center m-1 p-1" role="alert">
+              <div class="row-cols-2 align-content-center m-1 text-center">
+                <i class="bi bi-lightbulb fs-3"></i>
+              </div>
+              <div class="row-cols-10 m-auto text-center">
+                <b>はじめて</b>このシステムを使用するときは、<a href="setting.html">設定画面</a>からリハビリの種類を選択してください。
+              </div>
+            </div>
+            <div class="alert alert-warning d-flex align-content-center m-1 p-1" role="alert">
+              <div class="row-cols-2 align-content-center m-1 text-center">
+                <i class="bi bi-lightbulb fs-3"></i>
+              </div>
+              <div class="row-cols-10 d-flex align-items-center m-auto text-center">
+                何回でも<br>取り組むリハビリの種類を<br>変更することができます。
+              </div>
+            </div>
           </div>
         </div>
       </div>
